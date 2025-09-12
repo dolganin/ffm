@@ -1,0 +1,5 @@
+environment:
+  type: vizdoom
+  env_id: VizdoomBasic-v0
+  frame_skip: 1
+  resolution: 64
