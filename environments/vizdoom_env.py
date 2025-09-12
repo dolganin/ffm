@@ -38,3 +38,7 @@ class VizDoomEnv:
 
     def close(self):
         self.env.close()
+
+    def render(self):
+        """Render the underlying environment and return an RGB array."""
+        return self.env.render()

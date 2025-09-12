@@ -2,3 +2,5 @@ environment:
   type: minigrid
   env_id: MiniGrid-Empty-5x5-v0
   max_steps: 100
+updates: 1
+video_every: null

@@ -3,3 +3,5 @@ environment:
   env_id: VizdoomBasic-v0
   frame_skip: 1
   resolution: 64
+updates: 1
+video_every: null
