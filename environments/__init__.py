@@ -13,7 +13,14 @@ def create_env(config: dict):
     """
     cfg = dict(config)
     env_type = cfg.pop("type", None)
+    env_type = env_type.lower() if isinstance(env_type, str) else env_type
+
+    env_id = cfg.pop("name", cfg.pop("env_id", None))
+    if env_id is not None:
+        cfg["env_id"] = env_id
+
     cfg.setdefault("render_mode", "rgb_array")
+
     if env_type == "minigrid":
         return MiniGridEnv(**cfg)
     if env_type == "vizdoom":

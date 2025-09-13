@@ -1,7 +1,39 @@
 environment:
-  type: vizdoom
-  env_id: VizdoomBasic-v0
-  frame_skip: 1
-  resolution: 64
-updates: 1
-video_every: null
+  type: Vizdoom
+  name: VizdoomBasic-v0
+  scenario: basic
+  frame_skip: 4
+gamma: 0.99
+lamda: 0.95
+updates: 650
+epochs: 4
+n_workers: 16
+worker_steps: 128
+n_mini_batch: 8
+value_loss_coefficient: 0.25
+hidden_layer_size: 256
+max_grad_norm: 0.5
+recurrence:
+  sequence_length: 8
+  hidden_state_size: 256
+  layer_type: lstm
+  reset_hidden_state: false
+  init_state:
+    hx_path: null
+    cx_path: null
+learning_rate_schedule:
+  initial: 2.0e-4
+  final: 2.0e-4
+  power: 1.0
+  max_decay_steps: 300
+beta_schedule:
+  initial: 0.001
+  final: 0.001
+  power: 1.0
+  max_decay_steps: 300
+clip_range_schedule:
+  initial: 0.2
+  final: 0.2
+  power: 1.0
+  max_decay_steps: 300
+video_every: 10

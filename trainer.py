@@ -61,7 +61,7 @@ class PPOTrainer:
 
         # Schedules
         self.lr_schedule = config.get(
-            "lr_schedule",
+            "learning_rate_schedule",
             {"initial": 3e-4, "final": 3e-4, "max_decay_steps": 1, "power": 1.0},
         )
         self.beta_schedule = config.get(
@@ -69,7 +69,7 @@ class PPOTrainer:
             {"initial": 1.0, "final": 1.0, "max_decay_steps": 1, "power": 1.0},
         )
         self.cr_schedule = config.get(
-            "cr_schedule",
+            "clip_range_schedule",
             {"initial": 0.2, "final": 0.2, "max_decay_steps": 1, "power": 1.0},
         )
 
@@ -83,7 +83,7 @@ class PPOTrainer:
             samples_flat=[],
         )
 
-        self.recurrence = {"layer_type": "gru"}
+        self.recurrence = config.get("recurrence", {"layer_type": "gru"})
 
     # ------------------------------------------------------------------ utils
     def _sample_training_data(self) -> List[dict]:
@@ -172,6 +172,24 @@ class PPOTrainer:
 
         return arr
 
+    def _load_initial_rc(self, batch: int, device: torch.device):
+        """Load initial recurrent states from config paths if provided."""
+        layer_type = self.recurrence.get("layer_type", "gru")
+        hxs, cxs = self.model.init_recurrent_cell_states(batch, device)
+        init_conf = self.recurrence.get("init_state", {})
+
+        hx_path = init_conf.get("hx_path")
+        if hx_path:
+            hxs = torch.load(hx_path, map_location=device)
+
+        if layer_type != "gru":
+            cx_path = init_conf.get("cx_path")
+            if cx_path:
+                cxs = torch.load(cx_path, map_location=device)
+            return hxs, cxs
+
+        return hxs
+
     def _record_eval_episode(self, step: int) -> None:
         print(f"[eval] Recording evaluation gif for step {step}...")
 
@@ -184,8 +202,7 @@ class PPOTrainer:
         obs = reset_out[0] if isinstance(reset_out, (tuple, list)) and len(reset_out) >= 1 else reset_out
 
         frames: List[np.ndarray] = []
-        hxs, cxs = self.model.init_recurrent_cell_states(1, self.device)
-        rc = hxs if self.recurrence["layer_type"] == "gru" else (hxs, cxs)
+        rc = self._load_initial_rc(1, self.device)
 
         raw = env.render()
         first = self._to_hwc_uint8(raw)
