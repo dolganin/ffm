@@ -12,14 +12,26 @@ class MiniGridEnv:
     ----------
     env_id: str
         Name of the MiniGrid environment to create via ``gym.make``.
+    view_size: int, optional
+        Convenience alias mapped to ``agent_view_size`` expected by MiniGrid.
+    tile_size: int, optional
+        Overrides the rendering tile size after environment creation.
     kwargs: dict
         Additional keyword arguments forwarded to ``gym.make``.
     """
 
-    def __init__(self, env_id: str, **kwargs):
+    def __init__(self, env_id: str, view_size=None, tile_size=None, **kwargs):
         if minigrid is None:
             raise ImportError("gym-minigrid is not installed")
+
+        if view_size is not None:
+            kwargs["agent_view_size"] = view_size
+
         self.env = gym.make(env_id, **kwargs)
+
+        if tile_size is not None and hasattr(self.env, "tile_size"):
+            self.env.tile_size = tile_size
+
         self.observation_space = self.env.observation_space
         self.action_space = self.env.action_space
         self.max_episode_steps = getattr(self.env, "max_episode_steps", None)
