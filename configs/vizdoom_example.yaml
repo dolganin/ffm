@@ -1,0 +1,51 @@
+environment:
+    type: "Vizdoom"
+    config: "./venv/lib64/python3.10/site-packages/vizdoom/scenarios/health_gathering.cfg"
+    scenario: "./venv/lib64/python3.10/site-packages/vizdoom/scenarios/health_gathering.wad"
+    frame_skip: 4
+    resolution: "RES_160X120"
+gamma: 0.995
+lamda: 0.95
+updates: 650
+epochs: 5
+n_workers: 16
+worker_steps: 512
+n_mini_batch: 8
+value_loss_coefficient: 0.5
+hidden_layer_size: 384
+max_grad_norm: 0.5
+transformer:
+    num_blocks: 3
+    embed_dim: 384
+    num_heads: 4
+    memory_length: 64
+    positional_encoding: "relative"
+    layer_norm: "post"
+    gtrxl: False
+    gtrxl_bias: 0.0
+learning_rate_schedule:
+    initial: 3.5e-4
+    final: 1.0e-4
+    power: 1.0
+    max_decay_steps: 250
+beta_schedule:
+    initial: 0.001
+    final: 0.001
+    power: 1.0
+    max_decay_steps: 10000
+clip_range_schedule:
+    initial: 0.1
+    final: 0.1
+    power: 1.0
+    max_decay_steps: 10000
+fps: 15
+video_every: 10
+#svd_rank_frac: 0.15
+#tt_rank_frac: 0.75
+#gauss_filter: true
+#laplace_filter: true
+#enable_vae: true
+#vae_latent_dim: 32
+#vae_lr: 1e-5
+#vae_beta: 0.0
+
