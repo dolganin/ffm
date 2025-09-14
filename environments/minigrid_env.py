@@ -1,4 +1,4 @@
-import gym
+import gymnasium as gym
 try:
     import minigrid  # noqa: F401
 except Exception as e:  # pragma: no cover - only executed when module missing

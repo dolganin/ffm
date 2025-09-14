@@ -218,7 +218,14 @@ class PPOTrainer:
 
         while not done and steps < max_steps:
             with torch.no_grad():
-                obs_tensor = torch.as_tensor(np.asarray(obs)).unsqueeze(0).to(self.device)
+                if isinstance(obs, dict):
+                    # Берем только "image" часть наблюдения
+                    obs_arr = np.asarray(obs["image"], dtype=np.float32)
+                else:
+                    obs_arr = np.asarray(obs, dtype=np.float32)
+
+                obs_tensor = torch.as_tensor(obs_arr).unsqueeze(0).to(self.device)
+
                 pol, _, rc = self.model(obs_tensor, rc, self.device)
                 act = np.array([p.probs.argmax(-1).item() for p in pol])
 

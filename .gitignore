@@ -4,3 +4,4 @@
 *.swp
 *.swo
 *.egg_info
+venv/
