@@ -1,0 +1,59 @@
+import gym
+try:
+    import minigrid  # noqa: F401
+except Exception as e:  # pragma: no cover - only executed when module missing
+    minigrid = None
+
+
+class MiniGridEnv:
+    """Simple wrapper around gym-minigrid environments.
+
+    Parameters
+    ----------
+    env_id: str
+        Name of the MiniGrid environment to create via ``gym.make``.
+    view_size: int, optional
+        Convenience alias mapped to ``agent_view_size`` expected by MiniGrid.
+    tile_size: int, optional
+        Overrides the rendering tile size after environment creation.
+    kwargs: dict
+        Additional keyword arguments forwarded to ``gym.make``.
+    """
+
+    def __init__(self, env_id: str, view_size=None, tile_size=None, **kwargs):
+        if minigrid is None:
+            raise ImportError("gym-minigrid is not installed")
+
+        if view_size is not None:
+            kwargs["agent_view_size"] = view_size
+
+        self.env = gym.make(env_id, **kwargs)
+
+        if tile_size is not None and hasattr(self.env, "tile_size"):
+            self.env.tile_size = tile_size
+
+        self.observation_space = self.env.observation_space
+        self.action_space = self.env.action_space
+        self.max_episode_steps = getattr(self.env, "max_episode_steps", None)
+
+    def reset(self):
+        obs = self.env.reset()
+        if isinstance(obs, tuple):  # gym>=0.26 returns (obs, info)
+            obs = obs[0]
+        return obs
+
+    def step(self, action):
+        result = self.env.step(action)
+        if len(result) == 5:  # gymnasium style
+            obs, reward, terminated, truncated, info = result
+            done = terminated or truncated
+        else:
+            obs, reward, done, info = result
+        return obs, reward, done, info
+
+    def close(self):
+        self.env.close()
+
+    def render(self):
+        """Render the underlying environment and return an RGB array."""
+        return self.env.render()
